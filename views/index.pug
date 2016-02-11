@@ -1,0 +1,29 @@
+html
+  head
+    title Who is my representative?
+  body
+    h1 Search for reps
+    
+    form(method="get" action="/")
+      select(name="type")
+        option(value="zip") Zip
+        option(value="name") Name
+        option(value="state") State
+      input(type="text" name="search")
+      button Submit
+      
+    if reps && reps.length === 0
+      p No Results Found!
+      
+    if reps && reps.length > 0
+      ul
+        for rep in reps
+          li
+            ul
+              li= rep.name
+              li= rep.party
+              li= rep.state
+              li= rep.district
+              li= rep.phone
+              li= rep.office
+              li= rep.link

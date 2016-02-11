@@ -1,12 +1,42 @@
-var express = require('express'),
-    reps = require('./lib/reps');
+'use strict';
 
-var app = express();
+const path = require('path');
+const express = require('express');
+const reps = require('./lib/reps');
+
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+app.set('port', PORT);
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+app.set('view cache', false);
 
 app.get('/', function(req, res) {
-  res
-    .status(200)
-    .send('Welcome to my api!');
+  if (req.query.type === 'zip') {
+    method = reps.allByZip;
+  }
+  else if (req.query.type === 'name') {
+    method = reps.repsByName;
+  }
+  else if (req.query.type === 'state') {
+    method = reps.repsByState;
+  }
+
+  if (method) {
+    var method;
+    method(req.query.search, function(err, people) {
+      if (err) { return next(err);}
+      res.render('index', {
+        reps: people
+      });
+    });
+  }
+  else {
+    res.render('index', {
+      reps: null
+    });
+  }
 });
 
 app.get('/all/by-zip/:zip', function(req, res, next) {
@@ -84,8 +114,8 @@ app.get('/sens/by-state/:state', function(req, res, next) {
   });
 });
 
-app.listen(8000, function() {
-  console.log('Listening on port 8000 :P');
+app.listen(PORT, function() {
+  console.log(`Listening on port ${PORT}`);
 });
 
 module.exports = app;
